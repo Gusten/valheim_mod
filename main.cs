@@ -36,7 +36,7 @@ namespace ValheimMod
 
         [HarmonyPatch(typeof(Character), "Jump")]
         [HarmonyPrefix]
-        public static void Prefix(Character __instance, ref float __state, [HarmonyArgument(0)] bool force)
+        public static void Jump_Prefix(ref Character __instance, ref float __state, [HarmonyArgument(0)] bool force)
         {
             // Save the normal jump stamina cost and restore it in PostFix
             __state = __instance.m_jumpStaminaUsage;
@@ -45,7 +45,7 @@ namespace ValheimMod
 
         [HarmonyPatch(typeof(Character), "Jump")]
         [HarmonyPostfix]
-        public static void Postfix(Character __instance, float __state, [HarmonyArgument(0)] bool force)
+        public static void Jump_Postfix(ref Character __instance, float __state, [HarmonyArgument(0)] bool force)
         {
             // Restore the normal value from Prefix
             __instance.m_jumpStaminaUsage = __state;
@@ -54,10 +54,10 @@ namespace ValheimMod
         [HarmonyPatch(typeof(Fireplace))]
         [HarmonyPatch("UpdateFireplace")]
         [HarmonyPrefix]
-        public static void Fireplace_UpdateFireplace(Fireplace __instance, ref ZNetView ___m_nview)
+        public static void Fireplace_UpdateFireplace(ref Fireplace __instance)
         {
             // If we're the net owner we set the fuel to max for all fireplaces (does not include smelters and such)
-            ZNetView m_nview = (ZNetView)AccessTools.Field(typeof(WearNTear), "m_nview").GetValue(__instance);
+            ZNetView m_nview = (ZNetView)AccessTools.Field(typeof(Fireplace), "m_nview").GetValue(__instance);
             if (!m_nview.IsValid() || !m_nview.IsOwner())
             {
                 return;
