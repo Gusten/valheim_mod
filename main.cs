@@ -68,19 +68,17 @@ namespace ValheimMod
         [HarmonyPatch(typeof(WearNTear), "UpdateWear")]
         [HarmonyPrefix]
         [HarmonyPriority(Priority.Last)]
-        public static void WearNTear_UpdateWear(ref WearNTear __instance, [HarmonyArgument(0)] float time)
+        public static void WearNTear_UpdateWear(
+            ref WearNTear __instance,
+            ref ZNetView ___m_nview,
+            ref float ___m_rainTimer)
         {
-            ZNetView m_nview = (ZNetView)AccessTools.Field(typeof(WearNTear), "m_nview").GetValue(__instance);
-            if (!m_nview.IsValid() || !m_nview.IsOwner())
+            if (!___m_nview.IsValid() || !___m_nview.IsOwner())
             {
                 return;
             }
 
-            bool shouldUpdate = (bool)AccessTools.Method(typeof(WearNTear), "ShouldUpdate").Invoke(__instance, new object[] { time });
-            if (shouldUpdate)
-            {
-                AccessTools.Field(typeof(WearNTear), "m_rainTimer").SetValue(__instance, 0f);
-            }
+            ___m_rainTimer = 0f;
         }
     }
 }
