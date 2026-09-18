@@ -5,6 +5,7 @@ using JetBrains.Annotations;
 using System.Reflection;
 using UnityEngine;
 using static Heightmap;
+using static Player;
 using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
 
 namespace ValheimMod
@@ -49,6 +50,22 @@ namespace ValheimMod
         {
             // Restore the normal value from Prefix
             __instance.m_jumpStaminaUsage = __state;
+        }
+
+        [HarmonyPatch(typeof(Player), "GetTotalFoodValue")]
+        [HarmonyPrefix]
+        public static bool GetTotalFoodValue(ref Player __instance, out float hp, out float stamina, out float eitr)
+        {
+            hp = __instance.m_baseHP;
+            stamina = __instance.m_baseStamina;
+            eitr = 0f;
+            foreach (Food food in __instance.GetFoods())
+            {
+                hp += food.m_item.m_shared.m_food;
+                stamina += food.m_item.m_shared.m_foodStamina;
+                eitr += food.m_item.m_shared.m_foodEitr;
+            }
+            return false;
         }
 
         [HarmonyPatch(typeof(Fireplace))]
